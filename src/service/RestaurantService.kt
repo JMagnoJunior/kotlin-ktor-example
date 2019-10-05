@@ -30,6 +30,11 @@ object RestaurantService {
     }
 
     private fun toRestaurant(row: ResultRow): Restaurant =
-        Restaurant(id = row[Restaurants.id], name = row[Restaurants.name])
+        Restaurant(
+            id = row[Restaurants.id],
+            name = row[Restaurants.name],
+            local = row[Restaurants.local],
+            rate = row[Restaurants.rate]
+        )
 
 }
