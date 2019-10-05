@@ -41,7 +41,6 @@ fun Application.module(testing: Boolean = false) {
         method(HttpMethod.Delete)
         method(HttpMethod.Patch)
         header(HttpHeaders.Authorization)
-        header("MyCustomHeader")
         allowCredentials = true
         anyHost() // @TODO: Don't do this in production if possible. Try to limit it.
     }
@@ -53,6 +52,7 @@ fun Application.module(testing: Boolean = false) {
     install(Routing) {
 
         get("/") {
+
             call.respondText(
                 "Hello! This endpoints will help you to find the best restaurants.",
                 contentType = ContentType.Text.Plain
