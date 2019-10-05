@@ -15,11 +15,10 @@ plugins {
 apply plugin: 'kotlin'
 apply plugin: 'application'
 
-
 flyway {
     url = 'jdbc:h2:file:./database/restaurants'
     user = 'sa'
-    locations = ["filesystem:./resources/db/migration"]
+    locations = ["filesystem:./resources/db/migration", "filesystem:./resources/qa/data"]
 }
 
 group 'com.magnojr'
@@ -48,4 +47,5 @@ dependencies {
     compile 'org.jetbrains.exposed:exposed:0.17.4'
     compile 'com.zaxxer:HikariCP:3.3.1'
     testCompile "io.ktor:ktor-server-tests:$ktor_version"
+    compile "org.flywaydb:flyway-core:6.0.4"
 }

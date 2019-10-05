@@ -20,13 +20,14 @@ import org.slf4j.event.Level
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
-
-
 @Suppress("unused") // Referenced in application.conf
 @kotlin.jvm.JvmOverloads
 fun Application.module(testing: Boolean = false) {
 
-    DatabaseConfig.init()
+    DatabaseConfig.apply {
+        val databaseConfig = environment.config.config("database")
+        setup(databaseConfig)
+    }
 
     install(ContentNegotiation) {
         jackson {
@@ -52,8 +53,10 @@ fun Application.module(testing: Boolean = false) {
     install(Routing) {
 
         get("/") {
-            call.respondText("Hello! This endpoints will help you to find the best restaurants.",
-                contentType = ContentType.Text.Plain)
+            call.respondText(
+                "Hello! This endpoints will help you to find the best restaurants.",
+                contentType = ContentType.Text.Plain
+            )
         }
 
         restaurantEndpoint()

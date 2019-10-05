@@ -12,7 +12,7 @@ import java.util.*
 
 
 fun Route.restaurantEndpoint() {
-    route("/restaurant") {
+    route("/restaurants") {
 
         get() {
             call.respond(RestaurantService.getAll())

@@ -1,32 +1,37 @@
 package com.magnojr.config
 
-import com.magnojr.domain.Restaurant
-import com.magnojr.domain.Restaurants
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import io.ktor.config.ApplicationConfig
 import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.transactions.transaction
 
 
 object DatabaseConfig {
 
-    fun init() {
-        Database.connect(hikari())
-
+    fun setup(config: ApplicationConfig) {
+        Database.connect(hikari(config))
     }
 
-    private fun hikari(): HikariDataSource {
+    private fun hikari(config: ApplicationConfig): HikariDataSource {
+
+        val jdbcUrl: String = config.property("jdbcUrl").getString()
+        val driverClassName: String = config.propertyOrNull("driverClassName")?.getString() ?: "org.h2.Driver"
+        val username: String = config.propertyOrNull("username")?.getString() ?: "sa"
+        val maximumPoolSize: Int = config.propertyOrNull("maximumPoolSize")?.getString()?.toInt() ?: 3
+        val isAutoCommit: Boolean = config.propertyOrNull("isAutoCommit")?.getString()?.toBoolean() ?: false
+        val transactionIsolation: String =
+            config.propertyOrNull("transactionIsolation")?.getString() ?: "TRANSACTION_REPEATABLE_READ"
+
         val config = HikariConfig()
-        config.driverClassName = "org.h2.Driver"
-        config.jdbcUrl = "jdbc:h2:file:./database/restaurants"
-        config.username = "sa"
-        config.maximumPoolSize = 3
-        config.isAutoCommit = false
-        config.transactionIsolation = "TRANSACTION_REPEATABLE_READ"
+        config.driverClassName = driverClassName
+        config.jdbcUrl = jdbcUrl
+        config.username = username
+        config.maximumPoolSize = maximumPoolSize
+        config.isAutoCommit = isAutoCommit
+        config.transactionIsolation = transactionIsolation
         config.validate()
         return HikariDataSource(config)
     }
+
 
 }
