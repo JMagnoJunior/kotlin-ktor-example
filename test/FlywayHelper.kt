@@ -9,6 +9,13 @@ fun runMigrationForTest() {
         .locations(Location.FILESYSTEM_PREFIX + "./resources/db/migration")
         .dataSource("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", "sa", null)
         .load();
-
     flyway.migrate();
+}
+
+fun cleanDatabase() {
+    // TODO : Move this config to file
+    val flyway: Flyway = Flyway.configure()
+        .dataSource("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", "sa", null)
+        .load();
+    flyway.clean();
 }

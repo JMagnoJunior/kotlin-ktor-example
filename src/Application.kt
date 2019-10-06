@@ -17,6 +17,7 @@ import io.ktor.response.respondText
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import org.slf4j.event.Level
+import java.sql.Connection
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
@@ -24,9 +25,11 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 @kotlin.jvm.JvmOverloads
 fun Application.module(testing: Boolean = false) {
 
-    DatabaseConfig.apply {
+    var connection: Connection? = null
+
+    DatabaseConfig().apply {
         val databaseConfig = environment.config.config("database")
-        setup(databaseConfig)
+        setupHikary(databaseConfig)
     }
 
     install(ContentNegotiation) {
@@ -52,7 +55,6 @@ fun Application.module(testing: Boolean = false) {
     install(Routing) {
 
         get("/") {
-
             call.respondText(
                 "Hello! This endpoints will help you to find the best restaurants.",
                 contentType = ContentType.Text.Plain

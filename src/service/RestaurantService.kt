@@ -1,10 +1,8 @@
 package com.magnojr.service
 
 import com.magnojr.domain.Restaurant
-import com.magnojr.domain.Restaurants
-import com.magnojr.dto.CreateRestaurantDTO
+import com.magnojr.dto.RestaurantExternalDTO
 import com.magnojr.repository.Repository
-import org.jetbrains.exposed.sql.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -14,27 +12,29 @@ object RestaurantService {
 
     private val logger: Logger = LoggerFactory.getLogger(RestaurantService.javaClass)
 
-    suspend fun getAll(): List<Restaurant> = Repository.sqlCommand {
+    suspend fun getAll(): List<Restaurant> {
         logger.debug("Get all restaurants")
-        Restaurants.selectAll().map { toRestaurant(it) }
+        return Repository.getAll()
     }
 
-    suspend fun getById(id: UUID): Restaurant = Repository.sqlCommand {
+    suspend fun getById(id: UUID): Restaurant {
         logger.debug("Get restaurant by id {}", id)
-        Restaurants.select(Op.build { Restaurants.id eq id }).map { toRestaurant(it) }.first()
+        return Repository.getById(id)
     }
 
-    suspend fun create(newRestaurant: CreateRestaurantDTO): UUID = Repository.sqlCommand {
+    suspend fun update(id: UUID, updatetRestaurant: RestaurantExternalDTO): Restaurant {
+        logger.info("Updating a new restaurant {}", updatetRestaurant)
+        return Repository.update(id, updatetRestaurant)
+    }
+
+    suspend fun create(newRestaurant: RestaurantExternalDTO): UUID {
         logger.info("Creating a new restaurant {}", newRestaurant)
-        Restaurants.insert { it[name] = newRestaurant.name } get Restaurants.id
+        return Repository.insert(newRestaurant)
     }
 
-    private fun toRestaurant(row: ResultRow): Restaurant =
-        Restaurant(
-            id = row[Restaurants.id],
-            name = row[Restaurants.name],
-            local = row[Restaurants.local],
-            rate = row[Restaurants.rate]
-        )
+    suspend fun delete(id: UUID): Unit {
+        logger.info("Removing the restaurant {}", id)
+        return Repository.delete(id)
+    }
 
 }

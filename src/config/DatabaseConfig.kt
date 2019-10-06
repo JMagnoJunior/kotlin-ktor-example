@@ -4,11 +4,12 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.ktor.config.ApplicationConfig
 import org.jetbrains.exposed.sql.Database
+import java.sql.Connection
 
 
-object DatabaseConfig {
+class DatabaseConfig {
 
-    fun setup(config: ApplicationConfig) {
+    fun setupHikary(config: ApplicationConfig) {
         Database.connect(hikari(config))
     }
 
