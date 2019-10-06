@@ -2,7 +2,7 @@ package com.magnojr
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.magnojr.domain.Restaurant
-import com.magnojr.dto.RestaurantExternalDTO
+import com.magnojr.dto.RestaurantReceiverDTO
 import com.magnojr.repository.Repository
 import io.ktor.config.MapApplicationConfig
 import io.ktor.http.ContentType
@@ -40,7 +40,7 @@ class ApplicationTest {
 
     @Test
     fun testInsertRestaurants() = initialTestContext {
-        val dto: RestaurantExternalDTO = RestaurantExternalDTO("new test restaurant", "Mitte")
+        val dto: RestaurantReceiverDTO = RestaurantReceiverDTO("new test restaurant", "Mitte")
         handleRequest(HttpMethod.Post, "/restaurants") {
             addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             setBody(ObjectMapper().writeValueAsString(dto))
@@ -53,12 +53,13 @@ class ApplicationTest {
 
     @Test
     fun testUpdateRestaurants() = initialTestContext {
-        val newRestaurant : RestaurantExternalDTO = RestaurantExternalDTO(name = "test 1", local = "place 1")
-        val id : UUID = runBlocking {  Repository.insert(newRestaurant)  }
-        val restaurant : Restaurant = runBlocking {  Repository.getById(id)  }
+        val newRestaurant: Restaurant = Restaurant(name = "test 1", local = "place 1")
+        val id: UUID = runBlocking { Repository.insert(newRestaurant) }
+        val restaurant: Restaurant = runBlocking { Repository.getById(id) }
         assertNull(restaurant.rate)
 
-        val updateRestaurant: RestaurantExternalDTO = RestaurantExternalDTO(name = "test 1", local = "place 1", rate = 5)
+        val updateRestaurant: RestaurantReceiverDTO =
+            RestaurantReceiverDTO(name = "test 1", local = "place 1", rate = 5)
         handleRequest(HttpMethod.Put, "/restaurants/${id}") {
             addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             setBody(ObjectMapper().writeValueAsString(updateRestaurant))
@@ -66,7 +67,7 @@ class ApplicationTest {
             assertEquals(HttpStatusCode.OK, response.status())
             assertNotNull(response.content)
         }
-        val restaurantUpdated : Restaurant = runBlocking {  Repository.getById(id)  }
+        val restaurantUpdated: Restaurant = runBlocking { Repository.getById(id) }
         assertEquals(5, restaurantUpdated.rate)
     }
 

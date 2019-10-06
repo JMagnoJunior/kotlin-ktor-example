@@ -17,15 +17,12 @@ import io.ktor.response.respondText
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import org.slf4j.event.Level
-import java.sql.Connection
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 @Suppress("unused") // Referenced in application.conf
 @kotlin.jvm.JvmOverloads
 fun Application.module(testing: Boolean = false) {
-
-    var connection: Connection? = null
 
     DatabaseConfig().apply {
         val databaseConfig = environment.config.config("database")

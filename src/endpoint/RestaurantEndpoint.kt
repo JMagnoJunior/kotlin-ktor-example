@@ -1,7 +1,7 @@
 package com.magnojr.endpoint
 
 
-import com.magnojr.dto.RestaurantExternalDTO
+import com.magnojr.dto.RestaurantReceiverDTO
 import com.magnojr.service.RestaurantService
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
@@ -24,13 +24,13 @@ fun Route.restaurantEndpoint() {
         }
 
         post() {
-            val newRestaurant: RestaurantExternalDTO = call.receive<RestaurantExternalDTO>()
+            val newRestaurant: RestaurantReceiverDTO = call.receive<RestaurantReceiverDTO>()
             call.respond(RestaurantService.create(newRestaurant))
         }
 
         put("/{id}") {
             val id: UUID = UUID.fromString(call.parameters["id"])
-            val updatedRestaurant: RestaurantExternalDTO = call.receive<RestaurantExternalDTO>()
+            val updatedRestaurant: RestaurantReceiverDTO = call.receive<RestaurantReceiverDTO>()
             call.respond(RestaurantService.update(id, updatedRestaurant))
         }
 

@@ -11,8 +11,8 @@ object Restaurants : Table() {
 }
 
 data class Restaurant(
-    val id: UUID,
+    val id: UUID? = null,
     val name: String,
     val local: String?,
-    val rate: Int?
+    val rate: Int? = null
 )

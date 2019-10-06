@@ -2,7 +2,6 @@ package com.magnojr.repository
 
 import com.magnojr.domain.Restaurant
 import com.magnojr.domain.Restaurants
-import com.magnojr.dto.RestaurantExternalDTO
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -25,7 +24,7 @@ object Repository {
     }
 
     // FIXME : This method has to receive a Restaurant instead RestaurantExternalDTO
-    suspend fun insert(newRestaurant: RestaurantExternalDTO): UUID = sqlCommand {
+    suspend fun insert(newRestaurant: Restaurant): UUID = sqlCommand {
         Restaurants.insert {
             it[name] = newRestaurant.name
             it[local] = newRestaurant.local
@@ -34,7 +33,7 @@ object Repository {
     }
 
     // FIXME : This method has to receive a Restaurant instead RestaurantExternalDTO
-    suspend fun update(id: UUID, updatedRestaurant: RestaurantExternalDTO): Restaurant = sqlCommand {
+    suspend fun update(id: UUID, updatedRestaurant: Restaurant): Restaurant = sqlCommand {
         Restaurants.update({ Restaurants.id eq id }) {
             it[name] = updatedRestaurant.name
             it[local] = updatedRestaurant.local
