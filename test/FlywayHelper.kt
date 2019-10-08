@@ -1,21 +1,37 @@
 package com.magnojr
 
+import io.ktor.config.ApplicationConfig
+import io.ktor.server.testing.withTestApplication
 import org.flywaydb.core.Flyway
-import org.flywaydb.core.api.Location
 
-fun runMigrationForTest() {
-    // TODO : Move this config to file
-    val flyway: Flyway = Flyway.configure()
-        .locations(Location.FILESYSTEM_PREFIX + "./resources/db/migration")
-        .dataSource("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", "sa", null)
-        .load();
-    flyway.migrate();
-}
+class FlywayHelper {
 
-fun cleanDatabase() {
-    // TODO : Move this config to file
-    val flyway: Flyway = Flyway.configure()
-        .dataSource("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", "sa", null)
-        .load();
-    flyway.clean();
+    var dbConfig: ApplicationConfig? = null
+
+    fun runMigrationForTest(config: ApplicationConfig) {
+        val locations: List<String> = config.property("flyway.location").getList().map { it }
+        val flyway: Flyway = Flyway.configure()
+            .locations(*locations.toTypedArray())
+            .dataSource(
+                config?.property("jdbcUrl").getString(),
+                config?.property("user").getString(),
+                null
+            )
+            .load();
+        flyway.migrate();
+    }
+
+    fun cleanDatabase() {
+        withTestApplication {
+            val flyway: Flyway = Flyway.configure()
+                .dataSource(
+                    dbConfig?.property("jdbcUrl")?.getString(),
+                    dbConfig?.property("user")?.getString(),
+                    null
+                )
+                .load();
+            flyway.clean();
+        }
+    }
+
 }

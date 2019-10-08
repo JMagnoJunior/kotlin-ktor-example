@@ -14,6 +14,7 @@ import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.setBody
 import io.ktor.server.testing.withTestApplication
 import kotlinx.coroutines.runBlocking
+import org.flywaydb.core.api.Location
 import java.util.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -72,13 +73,24 @@ class ApplicationTest {
     }
 
     private fun initialTestContext(callback: TestApplicationEngine.() -> Unit): Unit {
-        runMigrationForTest()
+
+        // please, let me know if you find a better way to
+        val flywayHelper = FlywayHelper()
         withTestApplication({
             (environment.config as MapApplicationConfig).apply {
-                put("database.jdbcUrl", "jdbc:h2:mem:test")
+                put("database.jdbcUrl", "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1")
+                put("database.user", "sa")
+                put("database.flyway.location", listOf(Location.FILESYSTEM_PREFIX + "./resources/db/migration"))
+            }
+            flywayHelper.apply {
+                val databaseConfig = environment.config.config("database")
+                this.dbConfig = databaseConfig
+                runMigrationForTest(databaseConfig)
             }
             this.module(true)
         }, callback)
-        cleanDatabase()
+        flywayHelper.apply {
+            cleanDatabase()
+        }
     }
 }
