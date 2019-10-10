@@ -3,7 +3,7 @@ package com.magnojr
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.magnojr.domain.Restaurant
 import com.magnojr.dto.RestaurantReceiverDTO
-import com.magnojr.repository.Repository
+import com.magnojr.repository.RestaurantRepository
 import io.ktor.config.MapApplicationConfig
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
@@ -59,8 +59,8 @@ class ApplicationTest {
     @Test
     fun testUpdateRestaurants() = initialTestContext {
         val newRestaurant = Restaurant(name = "test 1", local = "place 1")
-        val id: UUID = runBlocking { Repository.insert(newRestaurant) }
-        val restaurant: Restaurant = runBlocking { Repository.getById(id) }
+        val id: UUID = runBlocking { RestaurantRepository.insert(newRestaurant) }
+        val restaurant: Restaurant = runBlocking { RestaurantRepository.getById(id) }
         assertNull(restaurant.rate)
 
         val updateRestaurant =
@@ -72,7 +72,7 @@ class ApplicationTest {
             assertEquals(HttpStatusCode.OK, response.status())
             assertNotNull(response.content)
         }
-        val restaurantUpdated: Restaurant = runBlocking { Repository.getById(id) }
+        val restaurantUpdated: Restaurant = runBlocking { RestaurantRepository.getById(id) }
         assertEquals(5, restaurantUpdated.rate)
     }
 
