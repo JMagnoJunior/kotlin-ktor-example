@@ -13,6 +13,7 @@ import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.setBody
 import io.ktor.server.testing.withTestApplication
+import io.ktor.util.KtorExperimentalAPI
 import kotlinx.coroutines.runBlocking
 import org.flywaydb.core.api.Location
 import java.util.*
@@ -23,6 +24,7 @@ import kotlin.test.assertNull
 
 class ApplicationTest {
 
+    @KtorExperimentalAPI
     @Test
     fun testRoot() = initialTestContext {
         handleRequest(HttpMethod.Get, "/").apply {
@@ -31,6 +33,7 @@ class ApplicationTest {
         }
     }
 
+    @KtorExperimentalAPI
     @Test
     fun testGetEmptyListRestaurants() = initialTestContext {
         handleRequest(HttpMethod.Get, "/restaurants").apply {
@@ -39,9 +42,10 @@ class ApplicationTest {
         }
     }
 
+    @KtorExperimentalAPI
     @Test
     fun testInsertRestaurants() = initialTestContext {
-        val dto: RestaurantReceiverDTO = RestaurantReceiverDTO("new test restaurant", "Mitte")
+        val dto = RestaurantReceiverDTO("new test restaurant", "Mitte")
         handleRequest(HttpMethod.Post, "/restaurants") {
             addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             setBody(ObjectMapper().writeValueAsString(dto))
@@ -51,15 +55,15 @@ class ApplicationTest {
         }
     }
 
-
+    @KtorExperimentalAPI
     @Test
     fun testUpdateRestaurants() = initialTestContext {
-        val newRestaurant: Restaurant = Restaurant(name = "test 1", local = "place 1")
+        val newRestaurant = Restaurant(name = "test 1", local = "place 1")
         val id: UUID = runBlocking { Repository.insert(newRestaurant) }
         val restaurant: Restaurant = runBlocking { Repository.getById(id) }
         assertNull(restaurant.rate)
 
-        val updateRestaurant: RestaurantReceiverDTO =
+        val updateRestaurant =
             RestaurantReceiverDTO(name = "test 1", local = "place 1", rate = 5)
         handleRequest(HttpMethod.Put, "/restaurants/${id}") {
             addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
@@ -72,7 +76,8 @@ class ApplicationTest {
         assertEquals(5, restaurantUpdated.rate)
     }
 
-    private fun initialTestContext(callback: TestApplicationEngine.() -> Unit): Unit {
+    @KtorExperimentalAPI
+    private fun initialTestContext(callback: TestApplicationEngine.() -> Unit) {
 
         // please, let me know if you find a better way to
 
