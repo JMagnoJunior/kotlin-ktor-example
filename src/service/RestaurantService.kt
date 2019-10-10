@@ -3,7 +3,7 @@ package com.magnojr.service
 import com.magnojr.converter.ConverterService
 import com.magnojr.domain.Restaurant
 import com.magnojr.dto.RestaurantReceiverDTO
-import com.magnojr.repository.Repository
+import com.magnojr.repository.RestaurantRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -15,29 +15,29 @@ object RestaurantService {
 
     suspend fun getAll(): List<Restaurant> {
         logger.debug("Get all restaurants")
-        return Repository.getAll()
+        return RestaurantRepository.getAll()
     }
 
     suspend fun getById(id: UUID): Restaurant {
         logger.debug("Get restaurant by id {}", id)
-        return Repository.getById(id)
+        return RestaurantRepository.getById(id)
     }
 
     suspend fun update(id: UUID, updateRestaurant: RestaurantReceiverDTO): Restaurant {
         logger.info("Updating a new restaurant {}", updateRestaurant)
         val restaurant: Restaurant = ConverterService.fromDTOToDomain(updateRestaurant)
-        return Repository.update(id, restaurant)
+        return RestaurantRepository.update(id, restaurant)
     }
 
     suspend fun create(newRestaurant: RestaurantReceiverDTO): UUID {
         logger.info("Creating a new restaurant {}", newRestaurant)
         val restaurant: Restaurant = ConverterService.fromDTOToDomain(newRestaurant)
-        return Repository.insert(restaurant)
+        return RestaurantRepository.insert(restaurant)
     }
 
     suspend fun delete(id: UUID): Unit {
         logger.info("Removing the restaurant {}", id)
-        return Repository.delete(id)
+        return RestaurantRepository.delete(id)
     }
 
 }

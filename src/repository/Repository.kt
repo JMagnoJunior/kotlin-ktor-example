@@ -9,8 +9,7 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 
-//TODO: This can be a super class
-object Repository {
+object RestaurantRepository {
 
     private suspend fun <T> sqlCommand(
         block: () -> T
@@ -23,7 +22,6 @@ object Repository {
         Restaurants.selectAll().map { toRestaurant(it) }
     }
 
-    // FIXME : This method has to receive a Restaurant instead RestaurantExternalDTO
     suspend fun insert(newRestaurant: Restaurant): UUID = sqlCommand {
         Restaurants.insert {
             it[name] = newRestaurant.name
@@ -32,7 +30,6 @@ object Repository {
         } get Restaurants.id
     }
 
-    // FIXME : This method has to receive a Restaurant instead RestaurantExternalDTO
     suspend fun update(id: UUID, updatedRestaurant: Restaurant): Restaurant = sqlCommand {
         Restaurants.update({ Restaurants.id eq id }) {
             it[name] = updatedRestaurant.name
@@ -43,19 +40,20 @@ object Repository {
     }
 
     suspend fun getById(id: UUID): Restaurant = sqlCommand {
-        Restaurants.select(Op.build { Restaurants.id eq id }).map { toRestaurant(it) }.first()
+        Restaurants.select(Op.build { Restaurants.id eq id })
+            .map { toRestaurant(it) }
+            .first()
     }
 
     suspend fun delete(id: UUID): Unit = sqlCommand {
         Restaurants.deleteIgnoreWhere { Restaurants.id eq id }
     }
 
-    //TODO : Cliente can send this convertion function
-    private fun toRestaurant(row: ResultRow): Restaurant =
-        Restaurant(
-            id = row[Restaurants.id],
-            name = row[Restaurants.name],
-            local = row[Restaurants.local],
-            rate = row[Restaurants.rate]
-        )
 }
+
+fun toRestaurant(row: ResultRow) = Restaurant(
+    id = row[Restaurants.id],
+    name = row[Restaurants.name],
+    local = row[Restaurants.local],
+    rate = row[Restaurants.rate]
+)
