@@ -75,22 +75,23 @@ class ApplicationTest {
     private fun initialTestContext(callback: TestApplicationEngine.() -> Unit): Unit {
 
         // please, let me know if you find a better way to
-        val flywayHelper = FlywayHelper()
+
+        val config = FlywayConfig(
+            locations = listOf(Location.FILESYSTEM_PREFIX + "./resources/db/migration"),
+            jdbcUrl = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1",
+            user = "sa",
+            password = null
+        )
+
         withTestApplication({
             (environment.config as MapApplicationConfig).apply {
-                put("database.jdbcUrl", "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1")
-                put("database.user", "sa")
-                put("database.flyway.location", listOf(Location.FILESYSTEM_PREFIX + "./resources/db/migration"))
+                put("database.jdbcUrl", config.jdbcUrl)
+                put("database.user", config.user)
+                put("database.flyway.location", config.locations)
             }
-            flywayHelper.apply {
-                val databaseConfig = environment.config.config("database")
-                this.dbConfig = databaseConfig
-                runMigrationForTest(databaseConfig)
-            }
+            runFlyway(Actions.MIGRATE, config)
             this.module(true)
         }, callback)
-        flywayHelper.apply {
-            cleanDatabase()
-        }
+        runFlyway(Actions.CLEAN, config)
     }
 }
